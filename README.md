@@ -1,4 +1,4 @@
-# nest-reader
+# TRead
 
 Markdown + LaTeX 精读阅读器。在任何有疑问的地方**划线提问**，AI 的回答就地呈现；
 每个提问都能**「再问一问」展开成全屏子页面**，页内可以继续划线提问——问题生问题，
@@ -15,7 +15,7 @@ Markdown + LaTeX 精读阅读器。在任何有疑问的地方**划线提问**�
 浏览器不允许 `file://` 直接跑 ES 模块，先起一个静态服务：
 
 ```bash
-cd nest-reader
+cd TRead
 python -m http.server 8800        # 任意静态服务器都行
 ```
 
@@ -47,7 +47,7 @@ python -m http.server 8800        # 任意静态服务器都行
 ## 目录结构
 
 ```
-nest-reader/
+TRead/
 ├── index.html          页面骨架
 ├── vendor/             本地依赖（markdown-it / KaTeX / highlight.js / GSAP），无构建
 └── src/

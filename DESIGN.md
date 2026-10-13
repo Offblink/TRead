@@ -1,4 +1,4 @@
-# Design: 嵌套问答阅读器（暂名 nest-reader）
+# Design: 嵌套问答阅读器（TRead）
 
 状态：待确认（brainstorm 阶段，未写一行代码）
 

@@ -55,7 +55,7 @@ export function exportJson() {
   const blob = new Blob([data], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'nest-reader-' + new Date().toISOString().slice(0, 10) + '.json';
+  a.download = 'TRead-' + new Date().toISOString().slice(0, 10) + '.json';
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   cb.toast && cb.toast('已导出（不含 API Key）', 'ok');

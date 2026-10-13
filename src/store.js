@@ -7,7 +7,7 @@
  *   [根文档] + [沿途祖先 QA 对] + [当前页] , 兄弟问题共享同一前缀(按 viewId 缓存)
  */
 
-const KEY = 'nest-reader:v1';
+const KEY = 'tread:v1';
 
 const SYS_PROMPT =
   '你是一名精读助手。基于提供的文档与上下文精确、直接地回答读者的问题。' +
@@ -195,7 +195,7 @@ export function messagesFor(viewId, quote, question) {
 export function exportData() {
   const { nodes, roots, currentId, settings } = state;
   return {
-    v: 1, app: 'nest-reader', exportedAt: new Date().toISOString(),
+    v: 1, app: 'TRead', exportedAt: new Date().toISOString(),
     nodes, roots, currentId,
     settings: { ...settings, apiKey: '' }, // 导出不带 key
   };
@@ -203,7 +203,7 @@ export function exportData() {
 
 export function importData(obj) {
   if (!obj || typeof obj !== 'object' || !obj.nodes || !Array.isArray(obj.roots)) {
-    throw new Error('不是有效的 nest-reader 数据文件');
+    throw new Error('不是有效的 TRead 数据文件');
   }
   const nodes = {};
   for (const [id, n] of Object.entries(obj.nodes)) {
