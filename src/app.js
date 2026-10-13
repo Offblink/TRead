@@ -41,8 +41,19 @@ function applyTheme(t) {
   if (s.theme !== t) { s.theme = t; save(); }
 }
 
-function toggleTheme() {
-  applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+function toggleTheme(e) {
+  const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+  const root = document.documentElement;
+  const run = () => applyTheme(next);
+  if (!document.startViewTransition) { run(); return; }  // 老引擎直接切
+  // 涟漪：从点击位置圆形展开覆盖全屏
+  const x = (e && e.clientX) || innerWidth - 40;
+  const y = (e && e.clientY) || 40;
+  const r = Math.ceil(Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)));
+  root.style.setProperty('--tr-x', x + 'px');
+  root.style.setProperty('--tr-y', y + 'px');
+  root.style.setProperty('--tr-r', r + 'px');
+  try { document.startViewTransition(run); } catch (err) { run(); }
 }
 
 /* ── 屏幕切换 ────────────────────────────────── */
@@ -202,10 +213,10 @@ function boot() {
   els.btnExport.addEventListener('click', settings.exportJson);
   els.btnImport.addEventListener('click', settings.importJson);
   document.addEventListener('keydown', onKey);
-  // 原生右键菜单：阅读区禁用（划线菜单已覆盖需求），输入框与代码块保留
+  // 原生右键菜单：除输入框外全部禁用（代码块也禁，复制走选区「复制」或 Ctrl+C）
   document.addEventListener('contextmenu', (e) => {
     const t = e.target;
-    if (t && t.closest && t.closest('textarea, input, [contenteditable="true"], pre, code')) return;
+    if (t && t.closest && t.closest('textarea, input, [contenteditable="true"]')) return;
     e.preventDefault();
   });
   onChange(() => { if (!els.entry.hidden) renderEntry(); });

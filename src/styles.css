@@ -285,6 +285,22 @@ mark.hl.flash{animation:hlflash .8s ease}
   #btn-map .lbl{display:none}
 }
 
+/* ── 常驻右上工具簇（入口屏） ─────────── */
+#corner-tools{position:fixed; top:14px; right:16px; display:flex; gap:10px; z-index:50}
+
+/* ── 主题切换涟漪（View Transition） ───── */
+::view-transition-old(root),::view-transition-new(root){animation:none; mix-blend-mode:normal}
+::view-transition-new(root){
+  clip-path:circle(0px at var(--tr-x,50%) var(--tr-y,50%));
+  animation:tr-ripple .55s ease-out forwards;
+}
+@keyframes tr-ripple{
+  to{clip-path:circle(var(--tr-r,150vmax) at var(--tr-x,50%) var(--tr-y,50%))}
+}
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-new(root){animation:none; clip-path:none}
+}
+
 /* ── 浅色主题（中性灰白，无粉色系） ──────── */
 :root[data-theme="light"]{
   --bg:#f6f7f9; --surface:#ffffff; --surface2:#eceef2; --border:#e2e5ea;
