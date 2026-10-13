@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nest-reader · 嵌套问答阅读器</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="vendor/github-dark.min.css">
+<link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+<!-- ═══════════ 入口屏 ═══════════ -->
+<div id="entry" class="screen">
+  <div class="entry-hero">
+    <h1 class="grad">nest-reader</h1>
+    <p class="tagline">Markdown + LaTeX 精读 · 划线提问 · 上下文继承的嵌套问答</p>
+    <div class="entry-actions">
+      <button id="btn-open" class="btn primary">📂 打开文件</button>
+      <button id="btn-export" class="btn">导出数据</button>
+      <button id="btn-import" class="btn">导入数据</button>
+      <button id="btn-settings-entry" class="btn ghost">⚙ 设置</button>
+    </div>
+    <div id="entry-roots" class="root-grid"></div>
+    <p class="hint" id="entry-hint">还没有文档 — 点「打开文件」载入 .md / .markdown / .txt</p>
+  </div>
+</div>
+
+<!-- ═══════════ 阅读器 ═══════════ -->
+<div id="app" class="screen" hidden>
+  <header id="topbar">
+    <button id="btn-back" class="btn ghost" title="返回上一页">‹ 返回</button>
+    <nav id="crumbs" class="crumbs"></nav>
+    <div class="spacer"></div>
+    <button id="btn-map" class="btn" title="拓扑地图">🗺 地图</button>
+    <button id="btn-settings" class="btn ghost" title="设置">⚙</button>
+  </header>
+  <main id="stage">
+    <div id="page" class="page">
+      <article class="reading">
+        <h1 id="page-title"></h1>
+        <div id="page-sub" class="page-sub"></div>
+        <div id="body" class="md-body"></div>
+      </article>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════ 划线浮动菜单 ═══════════ -->
+<div id="selmenu" class="popover" hidden>
+  <button class="mi" data-act="ask">💬 提问</button>
+  <button class="mi accent" data-act="deep">⤴ 再问一问</button>
+</div>
+
+<!-- ═══════════ 提问输入 ═══════════ -->
+<div id="composer" class="popover composer" hidden>
+  <div class="ctx-chip" id="composer-ctx">上下文：—</div>
+  <textarea id="composer-input" rows="3" placeholder="输入你的问题…（Enter 发送 / Esc 取消）"></textarea>
+  <div class="composer-foot">
+    <span class="quote" id="composer-quote"></span>
+    <span class="composer-btns">
+      <button id="composer-cancel" class="btn ghost">取消</button>
+      <button id="composer-send" class="btn primary">发送</button>
+    </span>
+  </div>
+</div>
+
+<!-- ═══════════ 地图抽屉 ═══════════ -->
+<div id="drawer-scrim" hidden></div>
+<aside id="mapdrawer" class="drawer" hidden>
+  <header class="drawer-head">
+    <span>🗺 拓扑地图</span>
+    <button id="map-close" class="btn ghost">✕</button>
+  </header>
+  <div id="map-tree" class="tree"></div>
+</aside>
+
+<!-- ═══════════ 设置 ═══════════ -->
+<div id="settings" class="modal-scrim" hidden>
+  <div class="modal">
+    <h2>⚙ 设置</h2>
+    <label>Base URL（OpenAI 兼容，含 /v1）
+      <input id="set-baseurl" placeholder="https://api.deepseek.com/v1" spellcheck="false"></label>
+    <label>API Key
+      <input id="set-key" type="password" placeholder="sk-…" spellcheck="false"></label>
+    <label>Model
+      <input id="set-model" placeholder="deepseek-chat" spellcheck="false"></label>
+    <label>上下文预算（字符）
+      <input id="set-budget" type="number" min="8000" step="1000" placeholder="120000"></label>
+    <p class="hint">配置只存在本机 localStorage；超预算时从最远的上游问答开始截断。</p>
+    <div class="modal-foot">
+      <button id="set-export" class="btn">导出数据</button>
+      <button id="set-import" class="btn">导入数据</button>
+      <span class="spacer"></span>
+      <button id="set-cancel" class="btn ghost">取消</button>
+      <button id="set-save" class="btn primary">保存</button>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip" hidden></div>
+<div id="toast" hidden></div>
+
+<input type="file" id="file-md" accept=".md,.markdown,.txt,.text" hidden>
+<input type="file" id="file-json" accept=".json,application/json" hidden>
+
+<script src="vendor/markdown-it.min.js"></script>
+<script src="vendor/katex/katex.min.js"></script>
+<script src="vendor/katex/contrib/auto-render.min.js"></script>
+<script src="vendor/highlight.min.js"></script>
+<script src="vendor/gsap.min.js"></script>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
