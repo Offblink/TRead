@@ -5,6 +5,16 @@ export function hasSettings(settings) {
 }
 
 /**
+ * 归一化 Base URL：去尾斜杠、剥误贴的 /chat/completions（客户端会自己拼该路径）。
+ * 不自动补 /v1（避免猜测网关布局；设置面板标签已写明格式）。
+ */
+export function normalizeBaseURL(u) {
+  let s = String(u || '').trim();
+  s = s.replace(/\/+$/, '').replace(/\/chat\/completions$/i, '').replace(/\/+$/, '');
+  return s;
+}
+
+/**
  * 流式对话。yield 增量文本。
  * @param {Array<{role,content}>} messages
  * @param {{baseURL,apiKey,model}} settings
@@ -14,7 +24,7 @@ export async function* streamChat(messages, settings, signal) {
   if (!settings.baseURL) throw new Error('尚未配置 Base URL（右上角 ⚙ 设置）');
   if (!settings.model) throw new Error('尚未配置模型名（右上角 ⚙ 设置）');
 
-  const url = settings.baseURL.replace(/\/+$/, '') + '/chat/completions';
+  const url = normalizeBaseURL(settings.baseURL) + '/chat/completions';
   let res;
   try {
     res = await fetch(url, {
@@ -62,7 +72,7 @@ export async function* streamChat(messages, settings, signal) {
 
 /** 非流式小请求（连通性测试用） */
 export async function ping(settings, signal) {
-  const url = settings.baseURL.replace(/\/+$/, '') + '/chat/completions';
+  const url = normalizeBaseURL(settings.baseURL) + '/chat/completions';
   const res = await fetch(url, {
     method: 'POST',
     headers: {

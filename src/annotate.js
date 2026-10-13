@@ -252,7 +252,7 @@ function wireAnswer(node, ans) {
     const txt = state.text || '';
     if (state.status === 'streaming' && !txt) {
       ans.className = 'qa-answer';
-      ans.innerHTML = '<div class="qa-empty">正在生成回答</div>';
+      ans.innerHTML = waitingHTML();
       return;
     }
     ans.className = 'qa-answer md-body';
@@ -260,6 +260,7 @@ function wireAnswer(node, ans) {
     renderMath(ans);
     removeError(ans);
     if (state.status === 'error') showRetry(ans, node, state.error);
+    else if (state.status === 'streaming') ans.appendChild(cursorEl());
     reflowDockOf(ans);
   };
   if (s) cardSubs.push(subscribe(node.id, paint));
@@ -401,23 +402,28 @@ const fmt = n => n >= 10000 ? (n / 10000).toFixed(1) + ' 万' : n.toLocaleString
 export function fillBody(node) {
   while (pageSubs.length) pageSubs.pop()();
   const s = getStream(node.id);
-  const paintBody = (text) => {
+  const paintBody = (text, streaming) => {
     renderRich(body, text || '');
     decorate();
     wirePageError(node);
+    if (streaming) {
+      const c = document.createElement('span');
+      c.className = 'stream-cursor';
+      body.appendChild(c);
+    }
   };
   if (s) {
     pageSubs.push(subscribe(node.id, (st) => {
       if (st.status === 'streaming') {
-        if (st.text) paintBody(st.text);
-        else if (!body.querySelector('.ph')) { body.innerHTML = '<p class="ph">✍️ 正在生成回答…</p>'; }
+        if (st.text) paintBody(st.text, true);
+        else body.innerHTML = waitingHTML();
       } else {
-        paintBody(st.text || node.content);
+        paintBody(st.text || node.content, false);
       }
     }));
-    if (s.status === 'streaming' && !s.text) body.innerHTML = '<p class="ph">✍️ 正在生成回答…</p>';
+    if (s.status === 'streaming' && !s.text) body.innerHTML = waitingHTML();
   } else if (node.content) {
-    paintBody(node.content);
+    paintBody(node.content, false);
   } else {
     body.innerHTML = '<p class="ph">（空页面）</p>';
   }
@@ -492,3 +498,14 @@ export function bind() {
 
 export function isOpen() { return !composer.hidden || !selmenu.hidden; }
 export function closeAll() { closeComposer(); hideMenu(); }
+
+export function waitingHTML() {
+  return '<div class="waiting"><span class="dot"></span><span class="dot"></span>' +
+    '<span class="dot"></span><span class="lbl">AI 正在思考…</span></div>';
+}
+
+function cursorEl() {
+  const s = document.createElement('span');
+  s.className = 'stream-cursor';
+  return s;
+}

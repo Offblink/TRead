@@ -1,6 +1,7 @@
 /* settings — AI 配置面板、数据导出/导入、文件选择 */
 
 import { getState, save, exportData, importData } from './store.js';
+import { ping, normalizeBaseURL } from './ai.js';
 
 const $ = id => document.getElementById(id);
 let cb = {}; // { reload(), toast(msg, kind) }
@@ -39,13 +40,30 @@ export function close() { $('settings').hidden = true; }
 
 function onSave() {
   const s = getState().settings;
-  s.baseURL = $('set-baseurl').value.trim();
+  s.baseURL = normalizeBaseURL($('set-baseurl').value);
   s.apiKey = $('set-key').value.trim();
   s.model = $('set-model').value.trim();
   s.budget = Math.max(8000, Number($('set-budget').value) || 120000);
   save();
   close();
-  cb.toast && cb.toast('设置已保存', 'ok');
+  cb.toast && cb.toast('设置已保存，正在验证连通性…');
+  verifyConnection();
+}
+
+/** 保存/导入配置后自动做一次最小连通性探测 */
+function verifyConnection() {
+  const s = getState().settings;
+  if (!s.baseURL || !s.model) return;
+  ping(s).then(r => {
+    if (cb.toast) {
+      cb.toast(r.ok
+        ? `端点连通 ✓ ${s.model}`
+        : `端点返回 HTTP ${r.status} ${r.statusText}（检查 URL / Key）`,
+        r.ok ? 'ok' : 'err');
+    }
+  }).catch(e => {
+    if (cb.toast) cb.toast('连接失败：' + e.message, 'err');
+  });
 }
 
 /* ── 数据导出 / 导入 ──────────────────────────── */
@@ -67,9 +85,12 @@ export function importJson() {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        importData(JSON.parse(reader.result));
-        cb.toast && cb.toast('数据已导入', 'ok');
+        const parsed = JSON.parse(reader.result);
+        const isConfigOnly = !parsed.nodes;
+        importData(parsed);
+        cb.toast && cb.toast(isConfigOnly ? '配置已导入，正在验证连通性…' : '数据已导入', 'ok');
         cb.reload && cb.reload();
+        if (isConfigOnly) verifyConnection();
       } catch (e) {
         cb.toast && cb.toast('导入失败：' + e.message, 'err');
       }

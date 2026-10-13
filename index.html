@@ -87,12 +87,12 @@
 <div id="settings" class="modal-scrim" hidden>
   <div class="modal">
     <h2>⚙ 设置</h2>
-    <label>Base URL（OpenAI 兼容，含 /v1）
-      <input id="set-baseurl" placeholder="https://api.deepseek.com/v1" spellcheck="false"></label>
+    <label>Base URL（OpenAI 兼容，含 /v1，不要带 /chat/completions）
+      <input id="set-baseurl" placeholder="https://api.xiaomimimo.com/v1" spellcheck="false"></label>
     <label>API Key
       <input id="set-key" type="password" placeholder="sk-…" spellcheck="false"></label>
     <label>Model
-      <input id="set-model" placeholder="deepseek-chat" spellcheck="false"></label>
+      <input id="set-model" placeholder="mimo-v2.6-flash" spellcheck="false"></label>
     <label>上下文预算（字符）
       <input id="set-budget" type="number" min="8000" step="1000" placeholder="120000"></label>
     <p class="hint">配置只存在本机 localStorage；超预算时从最远的上游问答开始截断。</p>

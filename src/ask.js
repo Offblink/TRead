@@ -5,7 +5,7 @@
  */
 
 import { getState, createNode, messagesFor, save } from './store.js';
-import { streamChat } from './ai.js';
+import { streamChat, hasSettings } from './ai.js';
 
 const streams = new Map();
 
@@ -65,6 +65,13 @@ async function run(node, s) {
   s.error = '';
   s.text = '';
   notify(s);
+  // 先验配置再组装/打日志，避免「未配置却显示已发送」的误导
+  if (!hasSettings(getState().settings)) {
+    s.status = 'error';
+    s.error = '尚未配置 Base URL 或模型（右上角 ⚙ 设置）';
+    notify(s);
+    return;
+  }
   try {
     const msgs = messagesFor(node.parentId, quoteOf(node), node.title);
     console.info('[ctx] 发送 messages=', msgs.length,
