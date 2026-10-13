@@ -11,7 +11,7 @@ const els = {};
 function cacheEls() {
   ['entry', 'app', 'body', 'page', 'page-title', 'page-sub', 'topbar', 'crumbs',
    'btn-back', 'btn-map', 'btn-open', 'btn-export', 'btn-import', 'entry-roots',
-   'entry-hint', 'toast'].forEach(id => els[id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = $(id));
+   'entry-hint', 'toast', 'btn-theme', 'btn-theme-entry'].forEach(id => els[id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = $(id));
 }
 
 /* ── toast ───────────────────────────────────── */
@@ -27,6 +27,22 @@ function toast(msg, kind = '') {
     if (window.gsap) gsap.to(t, { opacity: 0, duration: .3, onComplete: () => { t.hidden = true; } });
     else t.hidden = true;
   }, 2600);
+}
+
+/* ── 主题（深/浅，token 一处切换） ──────────── */
+
+function applyTheme(t) {
+  if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+  else document.documentElement.removeAttribute('data-theme');
+  const icon = t === 'light' ? '☀️' : '🌙';
+  els.btnTheme.textContent = icon;
+  els.btnThemeEntry.textContent = icon;
+  const s = st().settings;
+  if (s.theme !== t) { s.theme = t; save(); }
+}
+
+function toggleTheme() {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
 }
 
 /* ── 屏幕切换 ────────────────────────────────── */
@@ -174,21 +190,31 @@ function onKey(e) {
 function boot() {
   cacheEls();
 
-  annotate.init({ navigate, refreshMap: () => mapdrawer.refresh(), rerender });
+  annotate.init({ navigate, refreshMap: () => mapdrawer.refresh(), rerender, toast });
   mapdrawer.init({ navigate });
   settings.init({ reload, toast });
 
   els.btnBack.addEventListener('click', goBack);
   els.btnMap.addEventListener('click', () => mapdrawer.toggle());
+  els.btnTheme.addEventListener('click', toggleTheme);
+  els.btnThemeEntry.addEventListener('click', toggleTheme);
   els.btnOpen.addEventListener('click', openFile);
   els.btnExport.addEventListener('click', settings.exportJson);
   els.btnImport.addEventListener('click', settings.importJson);
   document.addEventListener('keydown', onKey);
+  // 原生右键菜单：阅读区禁用（划线菜单已覆盖需求），输入框与代码块保留
+  document.addEventListener('contextmenu', (e) => {
+    const t = e.target;
+    if (t && t.closest && t.closest('textarea, input, [contenteditable="true"], pre, code')) return;
+    e.preventDefault();
+  });
   onChange(() => { if (!els.entry.hidden) renderEntry(); });
 
   annotate.bind();
 
   reload();
+
+  applyTheme(st().settings.theme === 'light' ? 'light' : 'dark');
 
   if (settings.needsConfig()) {
     settings.open();

@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
 <link rel="stylesheet" href="vendor/github-dark.min.css">
 <link rel="stylesheet" href="src/styles.css">
+<script>try{var _s=JSON.parse(localStorage.getItem('tread:v1')||'{}');if(_s.settings&&_s.settings.theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
 </head>
 <body>
 
@@ -19,6 +20,7 @@
       <button id="btn-open" class="btn primary">📂 打开文件</button>
       <button id="btn-export" class="btn">导出数据</button>
       <button id="btn-import" class="btn">导入数据</button>
+      <button id="btn-theme-entry" class="btn ghost" title="切换深浅主题">🌙</button>
       <button id="btn-settings-entry" class="btn ghost">⚙ 设置</button>
     </div>
     <div id="entry-roots" class="root-grid"></div>
@@ -32,6 +34,7 @@
     <button id="btn-back" class="btn ghost" title="返回上一页">‹ 返回</button>
     <nav id="crumbs" class="crumbs"></nav>
     <div class="spacer"></div>
+    <button id="btn-theme" class="btn ghost" title="切换深浅主题">🌙</button>
     <button id="btn-map" class="btn" title="拓扑地图">🗺 地图</button>
     <button id="btn-settings" class="btn ghost" title="设置">⚙</button>
   </header>
@@ -50,6 +53,7 @@
 <div id="selmenu" class="popover" hidden>
   <button class="mi" data-act="ask">💬 提问</button>
   <button class="mi accent" data-act="deep">⤴ 再问一问</button>
+  <button class="mi" data-act="copy">📋 复制</button>
 </div>
 
 <!-- ═══════════ 提问输入 ═══════════ -->

@@ -4,6 +4,9 @@
   --fg:#e0e0e0; --muted:#666; --dim:#8a8a99;
   --c1:#4ade80; --c2:#60a5fa; --c3:#a78bfa; --c4:#f472b6;
   --warn:#fbbf24; --err:#f87171;
+  --body-fg:#d6d6dc; --btn-fg:#ccc;
+  --overlay-bg:#10101c; --topbar-bg:rgba(6,6,10,.85);
+  color-scheme:dark;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
@@ -22,7 +25,7 @@ button{font-family:inherit}
 
 /* ── 按钮 ───────────────────────────── */
 .btn{
-  background:var(--surface); border:1px solid var(--border); color:#ccc;
+  background:var(--surface); border:1px solid var(--border); color:var(--btn-fg);
   border-radius:8px; padding:8px 16px; font-size:.88rem; cursor:pointer;
   transition:border-color .2s, color .2s, transform .2s, box-shadow .2s;
 }
@@ -68,7 +71,7 @@ button{font-family:inherit}
 #topbar{
   position:sticky; top:0; z-index:40;
   display:flex; align-items:center; gap:14px;
-  padding:10px 18px; background:rgba(6,6,10,.85);
+  padding:10px 18px; background:var(--topbar-bg);
   backdrop-filter:blur(10px); border-bottom:1px solid var(--border);
 }
 .crumbs{display:flex; align-items:center; gap:6px; font-size:.82rem; min-width:0; overflow:hidden}
@@ -80,7 +83,7 @@ button{font-family:inherit}
 .crumbs .crumb:hover{color:var(--c1); background:rgba(74,222,128,.08)}
 .crumbs .crumb.cur{color:var(--fg); cursor:default}
 .crumbs .crumb.cur:hover{background:none; color:var(--fg)}
-.crumbs .sep{color:#333}
+.crumbs .sep{color:var(--muted);opacity:.6}
 
 /* ── 阅读区 ─────────────────────────── */
 #stage{position:relative}
@@ -103,7 +106,7 @@ button{font-family:inherit}
   border-radius:4px; margin-right:8px; background:var(--surface);
 }
 
-.md-body{font-size:17px; line-height:1.95; color:#d6d6dc; word-wrap:break-word}
+.md-body{font-size:17px; line-height:1.95; color:var(--body-fg); word-wrap:break-word}
 .md-body h1,.md-body h2,.md-body h3,.md-body h4{color:var(--fg); line-height:1.5; margin:1.6em 0 .7em; font-weight:750}
 .md-body h1{font-size:1.5em} .md-body h2{font-size:1.3em}
 .md-body h3{font-size:1.15em} .md-body h4{font-size:1.02em}
@@ -158,7 +161,7 @@ mark.hl.flash{animation:hlflash .8s ease}
 .qa-q{font-weight:700; color:var(--fg); font-size:.98rem; line-height:1.6; flex:1; word-break:break-word}
 .qa-actions{display:flex; gap:6px; flex:none}
 .qa-actions .btn{padding:3px 10px; font-size:.78rem}
-.qa-answer{font-size:.95rem; line-height:1.85; color:#cfcfd6}
+.qa-answer{font-size:.95rem; line-height:1.85; color:var(--body-fg)}
 .qa-answer .md-body{font-size:inherit}
 .qa-empty{color:var(--muted); font-size:.88rem; font-style:italic}
 .qa-empty::after{content:''; display:inline-block; width:7px; height:1em; margin-left:3px;
@@ -179,7 +182,7 @@ mark.hl.flash{animation:hlflash .8s ease}
 }
 #selmenu{display:flex; gap:4px; padding:5px}
 #selmenu .mi{
-  background:transparent; border:none; color:#ccc; font-size:.86rem;
+  background:transparent; border:none; color:var(--btn-fg); font-size:.86rem;
   padding:7px 12px; border-radius:8px; cursor:pointer; transition:all .15s;
   white-space:nowrap;
 }
@@ -224,7 +227,7 @@ mark.hl.flash{animation:hlflash .8s ease}
 .tree-children{margin-left:17px; border-left:1px solid var(--border); padding-left:6px}
 .tree-row{
   display:flex; align-items:center; gap:7px; padding:6px 8px; margin:1px 0;
-  border-radius:8px; cursor:pointer; font-size:.86rem; color:#bbb;
+  border-radius:8px; cursor:pointer; font-size:.86rem; color:var(--dim);
   transition:background .15s, color .15s; position:relative;
 }
 .tree-row:hover{background:rgba(74,222,128,.08); color:var(--fg)}
@@ -240,7 +243,7 @@ mark.hl.flash{animation:hlflash .8s ease}
 /* ── tooltip ────────────────────────── */
 #tooltip{
   position:fixed; z-index:120; max-width:340px;
-  background:#10101c; border:1px solid var(--border); border-radius:8px;
+  background:var(--overlay-bg); border:1px solid var(--border); border-radius:8px;
   padding:7px 11px; font-size:.8rem; color:var(--fg); line-height:1.6;
   box-shadow:0 8px 30px rgba(0,0,0,.55); pointer-events:none;
   word-break:break-word; white-space:pre-wrap;
@@ -269,7 +272,7 @@ mark.hl.flash{animation:hlflash .8s ease}
 /* ── toast ──────────────────────────── */
 #toast{
   position:fixed; left:50%; bottom:34px; transform:translateX(-50%);
-  z-index:130; background:#10101c; border:1px solid var(--border);
+  z-index:130; background:var(--overlay-bg); border:1px solid var(--border);
   border-radius:10px; padding:10px 18px; font-size:.87rem; color:var(--fg);
   box-shadow:0 10px 40px rgba(0,0,0,.55); max-width:80vw;
 }
@@ -281,3 +284,27 @@ mark.hl.flash{animation:hlflash .8s ease}
   .md-body{font-size:16px}
   #btn-map .lbl{display:none}
 }
+
+/* ── 浅色主题（中性灰白，无粉色系） ──────── */
+:root[data-theme="light"]{
+  --bg:#f6f7f9; --surface:#ffffff; --surface2:#eceef2; --border:#e2e5ea;
+  --fg:#1b1d22; --muted:#6b7280; --dim:#4b5563;
+  --c1:#16a34a; --c2:#2563eb; --c3:#7c3aed; --c4:#e11d48;
+  --warn:#d97706; --err:#dc2626;
+  --body-fg:#2b2e35; --btn-fg:#374151;
+  --overlay-bg:#ffffff; --topbar-bg:rgba(246,247,249,.85);
+  color-scheme:light;
+}
+/* 注意：必须用 background-image，不能用 background 简写——简写会把 .grad 的 background-clip:text 重置成 border-box，标题会变成实心色条 */
+:root[data-theme="light"] .grad{background-image:linear-gradient(135deg,#16a34a,#2563eb,#7c3aed)}
+:root[data-theme="light"] .btn.primary{color:#fff}
+:root[data-theme="light"] .btn.primary:hover{color:#fff}
+:root[data-theme="light"] mark.hl{background:rgba(22,163,74,.16); border-bottom-color:rgba(22,163,74,.65)}
+:root[data-theme="light"] mark.hl:hover{background:rgba(22,163,74,.3)}
+:root[data-theme="light"] .ctx-chip{background:rgba(22,163,74,.1); border-color:rgba(22,163,74,.35); color:#15803d}
+:root[data-theme="light"] .md-body tr:nth-child(even) td{background:rgba(17,24,39,.03)}
+:root[data-theme="light"] .md-body blockquote{background:#f0f2f5}
+/* 代码块两种主题下都保持深色底（配合 github-dark 语法色） */
+:root[data-theme="light"] .md-body pre,
+:root[data-theme="light"] .md-body code{background:#0d1117; border-color:#242a36; color:#c9d1d9}
+:root[data-theme="light"] .md-body pre code{background:none; border:none}

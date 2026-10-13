@@ -394,7 +394,20 @@ export function bind() {
   selmenu.addEventListener('click', (e) => {
     const btn = e.target.closest('.mi');
     if (!btn || !pending) return;
-    openComposer(btn.dataset.act === 'deep' ? 'full' : 'inline');
+    const act = btn.dataset.act;
+    if (act === 'copy') {
+      const text = pending.anchor.text;
+      const sel = window.getSelection();
+      if (sel) sel.removeAllRanges();
+      hideMenu();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(
+          () => cb.toast && cb.toast('已复制 ' + text.length + ' 字', 'ok'),
+          () => cb.toast && cb.toast('复制失败', 'err'));
+      } else if (cb.toast) cb.toast('复制失败：此环境无剪贴板权限', 'err');
+      return;
+    }
+    openComposer(act === 'deep' ? 'full' : 'inline');
   });
   $('composer-send').addEventListener('click', sendQuestion);
   $('composer-cancel').addEventListener('click', closeComposer);

@@ -14,7 +14,7 @@ const SYS_PROMPT =
   '使用 Markdown 排版；数学公式使用 LaTeX（行内 $...$，行间 $$...$$）。' +
   '不要复述问题，不要寒暄。若上下文中没有依据，明确指出。';
 
-export const DEFAULT_SETTINGS = { baseURL: '', apiKey: '', model: '', budget: 120000 };
+export const DEFAULT_SETTINGS = { baseURL: '', apiKey: '', model: '', budget: 120000, theme: 'dark' };
 
 function freshState() {
   return { v: 1, nodes: {}, roots: [], currentId: null, settings: { ...DEFAULT_SETTINGS } };
