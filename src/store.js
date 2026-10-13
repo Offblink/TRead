@@ -202,6 +202,12 @@ export function exportData() {
 }
 
 export function importData(obj) {
+  // 只含 settings 的文件 = 配置文件：只合并设置，不动任何数据
+  if (obj && typeof obj === 'object' && !obj.nodes && obj.settings && typeof obj.settings === 'object') {
+    state.settings = { ...DEFAULT_SETTINGS, ...obj.settings };
+    save();
+    return state;
+  }
   if (!obj || typeof obj !== 'object' || !obj.nodes || !Array.isArray(obj.roots)) {
     throw new Error('不是有效的 TRead 数据文件');
   }

@@ -42,11 +42,13 @@
   </header>
   <main id="stage">
     <div id="page" class="page">
+      <div id="dock-left" class="dock dock-left"></div>
       <article class="reading">
         <h1 id="page-title"></h1>
         <div id="page-sub" class="page-sub"></div>
         <div id="body" class="md-body"></div>
       </article>
+      <div id="dock-right" class="dock dock-right"></div>
     </div>
   </main>
 </div>
@@ -100,6 +102,18 @@
       <span class="spacer"></span>
       <button id="set-cancel" class="btn ghost">取消</button>
       <button id="set-save" class="btn primary">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ 自定义确认框（替代原生 confirm） ═══════════ -->
+<div id="confirm" class="modal-scrim" hidden>
+  <div class="modal confirm-modal">
+    <p id="confirm-msg"></p>
+    <div class="modal-foot">
+      <span class="spacer"></span>
+      <button id="confirm-cancel" class="btn ghost">取消</button>
+      <button id="confirm-ok" class="btn danger">删除</button>
     </div>
   </div>
 </div>

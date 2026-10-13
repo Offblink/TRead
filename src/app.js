@@ -56,6 +56,41 @@ function toggleTheme(e) {
   try { document.startViewTransition(run); } catch (err) { run(); }
 }
 
+/* ── 自定义确认框（Promise 化，替代原生 confirm） ── */
+
+function confirmDialog(message, okLabel = '删除') {
+  return new Promise(resolve => {
+    const scrim = $('confirm');
+    $('confirm-msg').textContent = message;
+    $('confirm-ok').textContent = okLabel;
+    scrim.hidden = false;
+    if (window.gsap) {
+      gsap.fromTo(scrim.querySelector('.modal'),
+        { scale: .95, opacity: 0 }, { scale: 1, opacity: 1, duration: .2, ease: 'power2.out' });
+    }
+    const ok = $('confirm-ok'), cancel = $('confirm-cancel');
+    function close(v) {
+      scrim.hidden = true;
+      ok.removeEventListener('click', onOk);
+      cancel.removeEventListener('click', onCancel);
+      scrim.removeEventListener('mousedown', onBackdrop);
+      document.removeEventListener('keydown', onKey, true);
+      resolve(v);
+    }
+    function onOk() { close(true); }
+    function onCancel() { close(false); }
+    function onBackdrop(e) { if (e.target === scrim) close(false); }
+    function onKey(e) {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(false); }
+    }
+    ok.addEventListener('click', onOk);
+    cancel.addEventListener('click', onCancel);
+    scrim.addEventListener('mousedown', onBackdrop);
+    document.addEventListener('keydown', onKey, true);
+    cancel.focus();
+  });
+}
+
 /* ── 屏幕切换 ────────────────────────────────── */
 
 function showScreen(name) {
@@ -201,7 +236,8 @@ function onKey(e) {
 function boot() {
   cacheEls();
 
-  annotate.init({ navigate, refreshMap: () => mapdrawer.refresh(), rerender, toast });
+  annotate.init({ navigate, refreshMap: () => mapdrawer.refresh(), rerender, toast, confirm: confirmDialog });
+  annotate.setDocks($('dock-left'), $('dock-right'));
   mapdrawer.init({ navigate });
   settings.init({ reload, toast });
 
@@ -213,6 +249,18 @@ function boot() {
   els.btnExport.addEventListener('click', settings.exportJson);
   els.btnImport.addEventListener('click', settings.importJson);
   document.addEventListener('keydown', onKey);
+  // 窗口跨过停靠断点（1340px）时重排：宽屏旁注 / 窄屏行内
+  let wasWide = innerWidth >= 1340, resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      const isWide = innerWidth >= 1340;
+      if (isWide !== wasWide) {
+        wasWide = isWide;
+        if (!els.app.hidden) rerender();
+      }
+    }, 250);
+  });
   // 原生右键菜单：除输入框外全部禁用（代码块也禁，复制走选区「复制」或 Ctrl+C）
   document.addEventListener('contextmenu', (e) => {
     const t = e.target;
@@ -235,6 +283,7 @@ function boot() {
 
 function reload() {
   const state = st();
+  applyTheme(state.settings.theme === 'light' ? 'light' : 'dark');
   if (state.currentId && state.nodes[state.currentId]) show(state.currentId);
   else goEntry();
 }

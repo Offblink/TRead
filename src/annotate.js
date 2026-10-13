@@ -100,30 +100,86 @@ function wrapRange(loc) {
   return first;
 }
 
-/* ── 装饰：子节点 → mark + 卡片 ───────────────── */
+/* ── 装饰：子节点 → mark + 页边停靠卡片 ─────── */
+
+const docks = {};   // { left, right } 页边旁注栏
+
+export function setDocks(left, right) { docks.left = left; docks.right = right; }
+
+function reflowDock(dock) {
+  let y = 0;
+  for (const c of dock.children) {
+    const desired = Number(c.dataset.desired || 0);
+    const top = Math.max(desired, y);
+    c.style.marginTop = top + 'px';
+    y = top + c.offsetHeight + 14;
+  }
+}
+
+function reflowDockOf(el) {
+  const card = el.closest && el.closest('.qa-card');
+  const dock = card && card.parentElement;
+  if (dock && dock.classList && dock.classList.contains('dock')) reflowDock(dock);
+}
+
+/** 停靠到左/右旁注栏；窄屏（dock 隐藏）返回 false 走行内回落 */
+function placeDocked(card, mark) {
+  if (!docks.left || docks.left.offsetParent === null) return false;
+  const markRect = mark.getBoundingClientRect();
+  const readingRect = body.closest('.reading').getBoundingClientRect();
+  const side = (markRect.left + Math.min(markRect.width, 40) / 2) < readingRect.left + readingRect.width / 2
+    ? 'left' : 'right';
+  const dock = side === 'left' ? docks.left : docks.right;
+  const desired = Math.max(0, Math.round(markRect.top - dock.getBoundingClientRect().top - 2));
+  card.classList.add('docked');
+  card.dataset.desired = String(desired);
+  dock.appendChild(card);
+  reflowDock(dock);
+  return true;
+}
+
+function wrapAnchor(node) {
+  const loc = locate(node.anchor);
+  if (!loc) return null;
+  const mark = wrapRange(loc);
+  if (!mark) return null;
+  mark.dataset.node = node.id;
+  mark.title = '💬 ' + node.title;
+  return mark;
+}
 
 export function decorate() {
   while (cardSubs.length) cardSubs.pop()();
+  if (docks.left) { docks.left.textContent = ''; }
+  if (docks.right) { docks.right.textContent = ''; }
   if (!body || !viewId) return;
   const kids = childrenOf(viewId).filter(n => n.kind === 'qa');
-  for (const k of kids) decorateOne(k);
+  const placed = [], orphans = [];
+  for (const k of kids) {
+    const mark = (k.anchor && k.anchor.text) ? wrapAnchor(k) : null;
+    if (mark) placed.push({ node: k, mark });
+    else orphans.push(k);
+  }
+  // 按正文位置排序后再停靠，页边栏才与阅读顺序一致
+  placed.sort((a, b) => a.mark.getBoundingClientRect().top - b.mark.getBoundingClientRect().top);
+  for (const { node, mark } of placed) {
+    const card = buildCard(node, false);
+    if (!placeDocked(card, mark)) insertAfterBlock(mark, card);
+  }
+  // 锚点失效或无锚点：卡片仍要出现（虚线样式，行内）
+  for (const k of orphans) {
+    const card = buildCard(k, true);
+    body.appendChild(card);
+  }
 }
 
 function decorateOne(node) {
-  if (node.anchor && node.anchor.text) {
-    const loc = locate(node.anchor);
-    if (loc) {
-      const mark = wrapRange(loc);
-      if (mark) {
-        mark.dataset.node = node.id;
-        mark.title = '💬 ' + node.title;
-        const card = buildCard(node, false);
-        insertAfterBlock(mark, card);
-        return;
-      }
-    }
+  const mark = (node.anchor && node.anchor.text) ? wrapAnchor(node) : null;
+  if (mark) {
+    const card = buildCard(node, false);
+    if (!placeDocked(card, mark)) insertAfterBlock(mark, card);
+    return;
   }
-  // 锚点失效或无锚点：卡片仍要出现（虚线样式）
   const card = buildCard(node, true);
   body.appendChild(card);
 }
@@ -167,10 +223,15 @@ function buildCard(node, lost) {
   btnDel.textContent = '✕';
   btnDel.title = '删除该提问（含其下的嵌套）';
   btnDel.addEventListener('click', () => {
-    if (!confirm('删除「' + node.title.slice(0, 30) + '」及其全部子提问？')) return;
-    abort(node.id);
-    deleteSubtree(node.id);
-    cb.rerender();
+    const p = cb.confirm
+      ? cb.confirm('删除「' + node.title.slice(0, 30) + '」及其全部子提问？此操作不可恢复。')
+      : Promise.resolve(false);
+    p.then(ok => {
+      if (!ok) return;
+      abort(node.id);
+      deleteSubtree(node.id);
+      cb.rerender();
+    });
   });
   actions.append(btnDeep, btnDel);
   head.appendChild(actions);
@@ -199,6 +260,7 @@ function wireAnswer(node, ans) {
     renderMath(ans);
     removeError(ans);
     if (state.status === 'error') showRetry(ans, node, state.error);
+    reflowDockOf(ans);
   };
   if (s) cardSubs.push(subscribe(node.id, paint));
   else if (node.content) paint({ status: 'done', text: node.content });
@@ -327,7 +389,7 @@ function sendQuestion() {
   if (mode === 'full') cb.navigate(node.id, { rect });
   else {
     // 滚到新卡片
-    const card = body.querySelector(`.qa-card[data-node="${node.id}"]`);
+    const card = document.querySelector(`.qa-card[data-node="${node.id}"]`);
     if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
@@ -419,7 +481,7 @@ export function bind() {
   document.addEventListener('click', (e) => {
     const m = e.target.closest && e.target.closest('mark.hl');
     if (!m || !body || !body.contains(m)) return;
-    const card = body.querySelector(`.qa-card[data-node="${m.dataset.node}"]`);
+    const card = document.querySelector(`.qa-card[data-node="${m.dataset.node}"]`);
     if (card) {
       card.scrollIntoView({ behavior: 'smooth', block: 'center' });
       card.classList.remove('flash');
