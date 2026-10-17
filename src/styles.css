@@ -70,16 +70,16 @@ button{font-family:inherit}
 }
 .root-card h3{font-size:.98rem; color:var(--fg); margin-bottom:6px; word-break:break-all; padding-right:26px}
 .root-card .meta{font-size:.75rem; color:var(--muted); font-family:ui-monospace,Consolas,monospace}
-/* 卡片右上角的删除：平时淡、hover/focus 变清楚，点它不会打开文档 */
+/* 卡片右上角的删除：常显（淡灰），hover 变红，点它不会打开文档 */
 .card-del{
-  position:absolute; top:10px; right:10px; width:24px; height:24px;
+  position:absolute; top:10px; right:10px; width:26px; height:26px;
   display:flex; align-items:center; justify-content:center;
   border:none; border-radius:6px; background:transparent; color:var(--muted);
-  font-size:.82rem; line-height:1; cursor:pointer; opacity:.45;
-  transition:opacity .15s, color .15s, background .15s;
+  font-size:.86rem; line-height:1; cursor:pointer;
+  transition:color .15s, background .15s;
 }
-.root-card:hover .card-del, .card-del:focus-visible{opacity:1}
-.card-del:hover{color:var(--err); background:rgba(220,38,38,.12)}
+.card-del:hover, .card-del:focus-visible{color:var(--err); background:rgba(220,38,38,.12)}
+.card-del:focus-visible{outline:1px solid var(--err); outline-offset:1px}
 
 /* ── 顶栏 ───────────────────────────── */
 #topbar{
@@ -284,15 +284,15 @@ mark.hl.flash{animation:hlflash .8s ease}
 }
 .tree-row .ti{flex:none; font-size:.85rem}
 .tree-row .tt{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1 1 auto}
-/* 地图每个节点的删除：常态淡显，hover 亮起；点它不触发跳转 */
+/* 地图每个节点的删除：常显（淡灰），hover 变红；点它不触发跳转 */
 .tree-del{
-  flex:none; width:20px; height:20px; display:flex; align-items:center; justify-content:center;
-  border:none; border-radius:5px; background:transparent; color:var(--muted);
-  font-size:.74rem; line-height:1; cursor:pointer; opacity:.35;
-  transition:opacity .15s, color .15s, background .15s;
+  flex:none; width:22px; height:22px; display:flex; align-items:center; justify-content:center;
+  border:none; border-radius:6px; background:transparent; color:var(--muted);
+  font-size:.8rem; line-height:1; cursor:pointer;
+  transition:color .15s, background .15s;
 }
-.tree-row:hover .tree-del, .tree-del:focus-visible{opacity:1}
-.tree-del:hover{color:var(--err); background:rgba(220,38,38,.12)}
+.tree-del:hover, .tree-del:focus-visible{color:var(--err); background:rgba(220,38,38,.12)}
+.tree-del:focus-visible{outline:1px solid var(--err); outline-offset:1px}
 .tree-empty{color:var(--muted); font-size:.85rem; padding:10px 12px; text-align:center}
 
 /* ── tooltip ────────────────────────── */
