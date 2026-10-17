@@ -77,9 +77,11 @@ export function pathToRoot(id) {
   return path;
 }
 
-export function createNode({ parentId = null, kind, title, content = '', anchor = null }) {
+export function createNode({ parentId = null, kind, title, content = '', anchor = null, mode = null, lang = null }) {
   const id = 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   const node = { id, parentId, kind, title, content, anchor, createdAt: Date.now() };
+  if (mode) node.mode = mode;          // 'md' | 'code' | 'text'（doc 才有；老数据缺省按内容再判）
+  if (lang) node.lang = lang;
   state.nodes[id] = node;
   if (kind === 'doc' && !parentId) state.roots.push(id);
   save();
@@ -220,6 +222,8 @@ export function importData(obj) {
         id, parentId: n.parentId ?? null, kind: n.kind,
         title: String(n.title || ''), content: String(n.content || ''),
         anchor: n.anchor || null, createdAt: n.createdAt || Date.now(),
+        ...(n.mode ? { mode: String(n.mode) } : {}),
+        ...(n.lang ? { lang: String(n.lang) } : {}),
       };
     }
   }

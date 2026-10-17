@@ -27,7 +27,7 @@
       <button id="btn-import" class="btn">导入数据</button>
     </div>
     <div id="entry-roots" class="root-grid"></div>
-    <p class="hint" id="entry-hint">还没有文档 — 点「打开文件」载入 .md / .markdown / .txt</p>
+    <p class="hint" id="entry-hint">还没有文档 — 点「打开文件」载入任意文本：.md / 代码 / .txt / .log…（二进制读不了，单文件上限 2 MB）</p>
   </div>
 </div>
 
@@ -122,7 +122,7 @@
 <div id="tooltip" hidden></div>
 <div id="toast" hidden></div>
 
-<input type="file" id="file-md" accept=".md,.markdown,.txt,.text" hidden>
+<input type="file" id="file-md" hidden>
 <input type="file" id="file-json" accept=".json,application/json" hidden>
 
 <script src="vendor/markdown-it.min.js"></script>

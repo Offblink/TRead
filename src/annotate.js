@@ -5,7 +5,7 @@
  * 装饰: decorate() 把当前视图的 qa 子节点画成 <mark> + 问答卡片
  */
 
-import { renderRich, renderMarkdown, renderMath } from './render.js';
+import { renderRich, renderMarkdown, renderMath, renderDoc, modeOf } from './render.js';
 import { getState, childrenOf, contextPreview, deleteSubtree } from './store.js';
 import { ask, subscribe, getStream, retry, abort } from './ask.js';
 
@@ -295,7 +295,12 @@ function hideMenu() { if (!selmenu.hidden) { selmenu.hidden = true; pending = nu
 function insideExcluded(range) {
   const c = range.commonAncestorContainer;
   const el = c.nodeType === 3 ? c.parentElement : c;
-  return Boolean(el && el.closest('.katex, pre, code'));
+  if (!el) return false;
+  // 只有公式内部不划线：KaTeX 把同一道公式在 DOM 里放三份（MathML + annotation 里的 TeX
+  // + 一个一个字形 span），实测 textContent 是 "E=mc2E=mc^2E=mc2"，选区出来是
+  // "𝐸\n=\n𝑚\n𝑐\n2…" —— 按文本偏移锚定必然错位。公式要单独走「TeX 源码锚」（待做）。
+  // 代码块不排除：文本节点稳定，锚点能正常重定位（整篇代码文档同理）。
+  return Boolean(el.closest('.katex'));
 }
 
 function onMouseUp(e) {
@@ -401,9 +406,12 @@ const fmt = n => n >= 10000 ? (n / 10000).toFixed(1) + ' 万' : n.toLocaleString
 
 export function fillBody(node) {
   while (pageSubs.length) pageSubs.pop()();
+  // doc 页按检测出的视图渲染（md / 整篇代码高亮 / 纯文本）；问答页永远是 markdown
+  const { mode, lang } = node.kind === 'doc' ? modeOf(node) : { mode: 'md', lang: null };
+  body.dataset.mode = mode;      // 划线系统据此决定"代码块内不许划线"要不要放开
   const s = getStream(node.id);
   const paintBody = (text, streaming) => {
-    renderRich(body, text || '');
+    renderDoc(body, text || '', mode, lang);
     decorate();
     wirePageError(node);
     if (streaming) {

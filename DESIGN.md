@@ -67,7 +67,10 @@ user:    当前页正文 + 本次划线选区（before/text/after）+ 新问题
 4. **地图抽屉**：顶栏地图按钮 → 右侧滑入；缩进树 + SVG 肘形连线；
    hover 节点 → tooltip 显示提问标题；click → 转场跳转；当前节点高亮描边
 5. **划线持久化**：text-quote anchoring（before/text/after 三元组重新定位）；
-   v1 限制：公式/代码块内部不支持划线（整块可提问）
+   代码块（含整篇代码文档）可划线；**公式内部不可划线**——KaTeX 的 DOM 把同一道公式放了三份
+   （MathML + `annotation` 的 TeX + 逐字形 span），`textContent` 是 `E=mc2E=mc^2E=mc2`，
+   偏移锚定会错位。公式的解法是「TeX 源码锚」：从
+   `annotation[encoding="application/x-tex"]` 取 TeX、按公式序号定位、高亮画在 `.katex` 盒子上（待做）
 
 ## Options Considered
 

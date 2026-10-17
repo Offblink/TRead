@@ -3,6 +3,7 @@
 import { getState, save, onChange, createNode, childrenOf, pathToRoot } from './store.js';
 import * as annotate from './annotate.js';
 import * as mapdrawer from './mapdrawer.js';
+import * as render from './render.js';
 import * as settings from './settings.js';
 
 const $ = id => document.getElementById(id);
@@ -138,11 +139,20 @@ function goEntry() {
 }
 
 async function openFile() {
-  const file = await settings.pickMarkdown();
+  const file = await settings.pickDoc();
   if (!file) return;
-  const text = await file.text();
-  const node = createNode({ kind: 'doc', title: file.name, content: text });
-  toast('已打开 ' + file.name, 'ok');
+  if (file.size > settings.MAX_BYTES) {
+    toast(`文件太大（${(file.size / 1048576).toFixed(1)} MB）——TRead 把正文存在浏览器 localStorage 里，上限 2 MB`, 'err');
+    return;
+  }
+  const { text, binary } = await settings.readTextFile(file);
+  if (binary) {
+    toast('这是二进制文件（PDF / 图片 / 压缩包…）——TRead 只读文本', 'err');
+    return;
+  }
+  const { mode, lang } = render.detect(text, file.name);
+  const node = createNode({ kind: 'doc', title: file.name, content: text, mode, lang });
+  toast(`已打开 ${file.name}${mode === 'code' ? `（代码${lang ? ' · ' + lang : ''}）` : mode === 'text' ? '（纯文本）' : ''}`, 'ok');
   show(node.id);
 }
 
@@ -161,8 +171,11 @@ function show(id, { rect } = {}) {
   els.app.dataset.kind = node.kind;
 
   els.pageTitle.textContent = node.title;
+  const kindLabel = node.kind !== 'doc' ? null
+    : node.mode === 'code' ? `代码${node.lang ? ' · ' + node.lang : ''}`
+    : node.mode === 'text' ? '纯文本' : '文档';
   els.pageSub.textContent = node.kind === 'doc'
-    ? `📄 文档 · ${node.content.length.toLocaleString()} 字 · ${pathToRoot(id).length === 1 ? '根节点' : ''}`
+    ? `📄 ${kindLabel} · ${node.content.length.toLocaleString()} 字 · ${pathToRoot(id).length === 1 ? '根节点' : ''}`
     : `💬 提问 · ${new Date(node.createdAt).toLocaleString()}`;
 
   annotate.setView(els.body, id);

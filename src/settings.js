@@ -101,6 +101,33 @@ export function importJson() {
 
 /* ── 文件选择 ────────────────────────────────── */
 
+// localStorage 放不下大文件；超过这个就直说，别让用户以为打开了
+export const MAX_BYTES = 2 * 1024 * 1024;
+
+/** 读任意文件为文本：先判二进制（NUL/控制字节），UTF-8 失败退 GB18030（中文老文件常见）。 */
+export async function readTextFile(file) {
+  const buf = new Uint8Array(await file.arrayBuffer());
+  const n = Math.min(buf.length, 8192);
+  let nul = 0, ctrl = 0;
+  for (let i = 0; i < n; i++) {
+    const b = buf[i];
+    if (b === 0) nul++;
+    else if (b < 9 || (b > 13 && b < 32)) ctrl++;
+  }
+  if (nul > 0 || ctrl / Math.max(1, n) > 0.1) return { binary: true };
+  let text = '';
+  try {
+    text = new TextDecoder('utf-8', { fatal: true }).decode(buf);
+  } catch (e) {
+    try { text = new TextDecoder('gb18030').decode(buf); }
+    catch (e2) { return { binary: true }; }
+  }
+  if (!text) return { binary: true };
+  const bad = (text.match(/\uFFFD/g) || []).length;
+  if (bad / text.length > 0.01) return { binary: true };
+  return { text };
+}
+
 function pickFile(inputId) {
   return new Promise(resolve => {
     const input = document.getElementById(inputId);
@@ -111,4 +138,4 @@ function pickFile(inputId) {
   });
 }
 
-export function pickMarkdown() { return pickFile('file-md'); }
+export function pickDoc() { return pickFile('file-md'); }

@@ -133,6 +133,22 @@ button{font-family:inherit}
   padding:14px 16px; overflow-x:auto; margin:1.2em 0;
 }
 .md-body pre code{background:none; border:none; padding:0; font-size:.85em; line-height:1.7}
+
+/* ── 文本阅读器的两种整篇视图 ───────────────────
+ * doc-code：整篇代码（hljs 高亮）；卡片底色沿用上面 pre 的 token（浅色是白卡片）
+ * doc-plain：纯文本（保留空白，正文字体，不套卡片） */
+.md-body pre.doc-code{
+  padding:18px 20px; margin:0; border-radius:12px;
+  line-height:1.7; font-size:14px; tab-size:4;
+}
+.md-body pre.doc-code code{
+  padding:0; font-size:inherit; line-height:inherit;
+  white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere;
+}
+.md-body .doc-plain{
+  margin:0; white-space:pre-wrap; word-break:break-word;
+  font-family:inherit; font-size:inherit; line-height:1.9;
+}
 .md-body table{border-collapse:collapse; margin:1.2em 0; width:100%; font-size:.94em}
 .md-body th,.md-body td{border:1px solid var(--border); padding:8px 12px; text-align:left}
 .md-body th{background:var(--surface); color:var(--fg)}
