@@ -31,9 +31,19 @@ function toast(msg, kind = '') {
 
 /* ── 主题（深/浅，token 一处切换） ──────────── */
 
+// 语法高亮主题跟着明暗切：浅色下块级代码用 github 浅色语法色（vendor/github.min.css），
+// 页面 head 里已按 localStorage 预先切好一次，这里负责后续手动切换
+function applyHighlightTheme(t) {
+  const light = document.getElementById('hljs-light');
+  const dark = document.getElementById('hljs-dark');
+  if (light) light.disabled = t !== 'light';
+  if (dark) dark.disabled = t === 'light';
+}
+
 function applyTheme(t) {
   if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
   else document.documentElement.removeAttribute('data-theme');
+  applyHighlightTheme(t);
   const icon = t === 'light' ? '☀️' : '🌙';
   els.btnTheme.textContent = icon;
   els.btnThemeEntry.textContent = icon;

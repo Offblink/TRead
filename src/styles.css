@@ -345,14 +345,14 @@ input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0
 :root[data-theme="light"]{
   --bg:#f6f7f9; --surface:#ffffff; --surface2:#eceef2; --border:#e2e5ea;
   --fg:#1b1d22; --muted:#6b7280; --dim:#4b5563;
-  --c1:#16a34a; --c2:#2563eb; --c3:#7c3aed; --c4:#e11d48;
+  --c1:#15803d; --c2:#2563eb; --c3:#7c3aed; --c4:#e11d48;
   --warn:#d97706; --err:#dc2626;
   --body-fg:#2b2e35; --btn-fg:#374151;
   --overlay-bg:#ffffff; --topbar-bg:rgba(246,247,249,.85);
   color-scheme:light;
 }
 /* 注意：必须用 background-image，不能用 background 简写——简写会把 .grad 的 background-clip:text 重置成 border-box，标题会变成实心色条 */
-:root[data-theme="light"] .grad{background-image:linear-gradient(135deg,#16a34a,#2563eb,#7c3aed)}
+:root[data-theme="light"] .grad{background-image:linear-gradient(135deg,var(--c1),var(--c2),var(--c3))}
 :root[data-theme="light"] .btn.primary{color:#fff}
 :root[data-theme="light"] .btn.primary:hover{color:#fff}
 :root[data-theme="light"] mark.hl{background:rgba(22,163,74,.16); border-bottom-color:rgba(22,163,74,.65)}
@@ -360,7 +360,8 @@ input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0
 :root[data-theme="light"] .ctx-chip{background:rgba(22,163,74,.1); border-color:rgba(22,163,74,.35); color:#15803d}
 :root[data-theme="light"] .md-body tr:nth-child(even) td{background:rgba(17,24,39,.03)}
 :root[data-theme="light"] .md-body blockquote{background:#f0f2f5}
-/* 代码块两种主题下都保持深色底（配合 github-dark 语法色） */
-:root[data-theme="light"] .md-body pre,
-:root[data-theme="light"] .md-body code{background:#0d1117; border-color:#242a36; color:#c9d1d9}
-:root[data-theme="light"] .md-body pre code{background:none; border:none}
+/* 代码：浅色下块级与行内都用浅底——块级是白卡片（surface），行内是灰 chip（surface2）。
+   语法色跟着明暗切：浅色用 vendor/github.min.css，深色用 vendor/github-dark.min.css
+   （切换在 index.html 的 head 与 app.js 的 applyTheme 里）。 */
+:root[data-theme="light"] .md-body pre{background:var(--surface); border-color:var(--border); color:#24292e}
+:root[data-theme="light"] .md-body pre code{background:none; border:none; color:inherit}

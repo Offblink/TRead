@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TRead · 嵌套问答阅读器</title>
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
-<link rel="stylesheet" href="vendor/github-dark.min.css">
+<link id="hljs-dark" rel="stylesheet" href="vendor/github-dark.min.css">
+<link id="hljs-light" rel="stylesheet" href="vendor/github.min.css" disabled>
 <link rel="stylesheet" href="src/styles.css">
-<script>try{var _s=JSON.parse(localStorage.getItem('tread:v1')||'{}');if(_s.settings&&_s.settings.theme==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+<script>try{var _s=JSON.parse(localStorage.getItem('tread:v1')||'{}');if(_s.settings&&_s.settings.theme==='light'){document.documentElement.setAttribute('data-theme','light');document.getElementById('hljs-light').disabled=false;document.getElementById('hljs-dark').disabled=true;}}catch(e){}</script>
 </head>
 <body>
 
