@@ -70,7 +70,16 @@ function buildGroup(id, parent, currentId) {
   const tt = document.createElement('span');
   tt.className = 'tt';
   tt.textContent = node.title || '（无标题）';
-  row.append(ti, tt);
+  const del = document.createElement('button');
+  del.className = 'tree-del';
+  del.type = 'button';
+  del.textContent = '✕';
+  del.title = '删除该节点（含其下全部提问）';
+  del.addEventListener('click', (e) => {
+    e.stopPropagation();                 // 别顺带跳转到这一页
+    if (cb.remove) cb.remove(id, node.title);
+  });
+  row.append(ti, tt, del);
   group.appendChild(row);
 
   const kids = childrenOf(id);

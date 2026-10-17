@@ -1,6 +1,6 @@
 /* app — 引导、导航、视图渲染与转场、入口屏 */
 
-import { getState, save, onChange, createNode, childrenOf, pathToRoot } from './store.js';
+import { getState, save, onChange, createNode, childrenOf, pathToRoot, deleteSubtree } from './store.js';
 import * as annotate from './annotate.js';
 import * as mapdrawer from './mapdrawer.js';
 import * as render from './render.js';
@@ -118,17 +118,45 @@ function renderEntry() {
   for (const id of st.roots) {
     const n = st.nodes[id];
     if (!n) continue;
-    const card = document.createElement('button');
+    // 卡片里要放删除按钮：不能用 <button> 包 <button>，改成 role=button 的 div + 键盘可达
+    const card = document.createElement('div');
     card.className = 'root-card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
     const h = document.createElement('h3');
     h.textContent = '📄 ' + n.title;
     const m = document.createElement('div');
     m.className = 'meta';
     m.textContent = `${n.content.length.toLocaleString()} 字 · ${childrenOf(id).length} 个提问`;
-    card.append(h, m);
+    const del = document.createElement('button');
+    del.className = 'card-del';
+    del.type = 'button';
+    del.textContent = '✕';
+    del.title = '删除这篇文档（含其下全部提问）';
+    del.addEventListener('click', (e) => {
+      e.stopPropagation();                 // 别顺带把文档打开
+      requestDelete(id, n.title);
+    });
+    card.append(h, m, del);
     card.addEventListener('click', () => show(id));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(id); }
+    });
     els.entryRoots.appendChild(card);
   }
+}
+
+/** 删除一个节点及其子树：自定义确认框 → 删 → 回到合适的位置（入口屏 / 当前页重渲染） */
+async function requestDelete(id, title) {
+  const name = (title || '（无标题）').slice(0, 30);
+  const ok = await confirmDialog(`删除「${name}」及其下全部提问？此操作不可恢复。`, '删除');
+  if (!ok) return;
+  const doomed = deleteSubtree(id);
+  const st = getState();
+  if (st.currentId && st.nodes[st.currentId]) show(st.currentId, {});
+  else goEntry();
+  if (mapdrawer.isOpen()) mapdrawer.refresh();
+  toast(`已删除 ${doomed.size} 个节点`, 'ok');
 }
 
 function goEntry() {
@@ -261,7 +289,7 @@ function boot() {
 
   annotate.init({ navigate, refreshMap: () => mapdrawer.refresh(), rerender, toast, confirm: confirmDialog });
   annotate.setDocks($('dock-left'), $('dock-right'));
-  mapdrawer.init({ navigate });
+  mapdrawer.init({ navigate, remove: requestDelete });
   settings.init({ reload, toast });
 
   els.btnBack.addEventListener('click', goBack);

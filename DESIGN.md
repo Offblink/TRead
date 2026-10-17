@@ -4,7 +4,7 @@
 
 ## Problem
 
-需要一个浏览器端阅读器：渲染 Markdown + LaTeX，读者可在任意疑问处划线提问，
+需要一个浏览器端阅读器：渲染 Markdown / 代码 / 任意文本（含 LaTeX 公式），读者可在任意疑问处划线提问，
 AI 回答就地呈现；每个「提问」可展开为全屏子页面（标题=问题，正文=回答），
 子页面内可继续划线提问 → 形成树。页面间需返回（父指针）与全局地图（右侧抽屉
 树形导航）。UX 参考 Offblink/Gasp-Design。
@@ -71,6 +71,9 @@ user:    当前页正文 + 本次划线选区（before/text/after）+ 新问题
    （MathML + `annotation` 的 TeX + 逐字形 span），`textContent` 是 `E=mc2E=mc^2E=mc2`，
    偏移锚定会错位。公式的解法是「TeX 源码锚」：从
    `annotation[encoding="application/x-tex"]` 取 TeX、按公式序号定位、高亮画在 `.katex` 盒子上（待做）
+6. **删除**：入口屏文件卡片右上角、地图抽屉每个节点右侧各一个 `✕`（`confirmDialog` 自定义确认框）；
+   删除走 `store.deleteSubtree(id)`（连带其下全部提问），删完按「当前页是否还在」决定重渲染还是回入口屏，
+   抽屉同步刷新
 
 ## Options Considered
 
